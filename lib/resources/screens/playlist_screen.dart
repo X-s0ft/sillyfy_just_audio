@@ -16,7 +16,6 @@ final testmap = <String, AudioSource>{
   ),
   'Saeki Chizu Shiki - Track 8': AudioSource.asset(
     'lib/resources/music/Basic Care Recommendation - Saeki Chizu Shiki - Track 8.mp3',
-
     tag: MediaItem(id: '2', title: 'Saeki Chizu Shiki - Track 8'),
   ),
   'Bust A Move DS - Puzzle Mode Round 4': AudioSource.asset(
@@ -165,9 +164,44 @@ final testmap = <String, AudioSource>{
 class _PlaylistScreenState extends State<PlaylistScreen> {
   final player = AudioPlayer();
   var titlekey = testmap.keys.toList();
+  var indexid = -1;
+  Duration position = Duration.zero;
+  Duration duration = Duration.zero;
 
-  void _onPressed() {
-    setState(() {});
+  String musicduration(Duration d) {
+    final minutes = d.inMinutes.remainder(60);
+    final seconds = d.inSeconds.remainder(60);
+    return "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
+  }
+
+  void handleSeek(double value) {
+    player.seek(Duration(seconds: value.toInt()));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    player.positionStream.listen((p) {
+      setState(() {
+        position = p;
+      });
+    });
+
+    player.durationStream.listen((d) {
+      setState(() {
+        duration = d!;
+      });
+    });
+
+    player.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        setState(() {
+          position = Duration.zero;
+        });
+        player.pause();
+        player.seek(position);
+      }
+    });
   }
 
   @override
@@ -177,51 +211,68 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(children: [Text('Плейлисты'), SizedBox.square(child: Text('data'),)]), // для плейлистов
-
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(height: 200),
+                SizedBox(height: 100),
                 Text('List of all music'),
-                player.playing
-                    ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            player.seekToPrevious();
-                          },
-                          icon: Icon(Icons.skip_previous),
-                        ),
-
-                        IconButton(
-                          onPressed: () {
-                            player.playing ? player.pause() : player.play();
-                          },
-                          icon: Icon(Icons.play_arrow),
-                        ),
-
-                        IconButton(
-                          onPressed: () {
-                            player.seekToNext();
-                          },
-                          icon: Icon(Icons.skip_next),
-                        ),
-                      ],
-                    )
-                    : Text(''),
+                SizedBox(height: 50),
                 SizedBox(
-                  height: 400,
+                  height: MediaQuery.of(context).size.height * 0.7,
                   width: MediaQuery.of(context).size.width * 1,
                   child: ListView.builder(
                     itemCount: testmap.length,
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Row(
-                          children: [Flexible(child: Text(titlekey[index]))],
+                          children: [
+                            Flexible(
+                              child: Column(
+                                children: [
+                                  Center(child: Text(titlekey[index])),
+                                  indexid == index
+                                      ? Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Slider(
+                                            min: 0.0,
+                                            max: duration.inSeconds.toDouble(),
+                                            value:
+                                                position.inSeconds.toDouble(),
+                                            onChanged: handleSeek,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(musicduration(position)),
+                                              Text(musicduration(duration)),
+                                            ],
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              player.playing
+                                                  ? player.pause()
+                                                  : player.play();
+                                            },
+                                            icon: Icon(
+                                              player.playing
+                                                  ? Icons.play_arrow
+                                                  : Icons.stop,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                      : Text(''),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         onTap: () {
+                          setState(() {
+                            indexid = index;
+                          });
+
                           var listitem = testmap.values.toList();
                           player.setAudioSources(
                             listitem,
@@ -245,3 +296,36 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     );
   }
 }
+
+
+
+// player.playing
+//                                       ? Row(
+//                                         mainAxisAlignment:
+//                                             MainAxisAlignment.center,
+//                                         children: [
+//                                           IconButton(
+//                                             onPressed: () {
+//                                               player.seekToPrevious();
+//                                             },
+//                                             icon: Icon(Icons.skip_previous),
+//                                           ),
+
+//                                           IconButton(
+//                                             onPressed: () {
+//                                               player.playing
+//                                                   ? player.pause()
+//                                                   : player.play();
+//                                             },
+//                                             icon: Icon(Icons.play_arrow),
+//                                           ),
+
+//                                           IconButton(
+//                                             onPressed: () {
+//                                               player.seekToNext();
+//                                             },
+//                                             icon: Icon(Icons.skip_next),
+//                                           ),
+//                                         ],
+//                                       )
+//                                       : Text(''),
