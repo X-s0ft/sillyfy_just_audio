@@ -165,48 +165,11 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   final player = AudioPlayer();
   var titlekey = testmap.keys.toList();
   var indexid = -1;
-  Duration position = Duration.zero;
-  Duration duration = Duration.zero;
-
-  String musicduration(Duration d) {
-    final minutes = d.inMinutes.remainder(60);
-    final seconds = d.inSeconds.remainder(60);
-    return "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
-  }
-
-  void handleSeek(double value) {
-    player.seek(Duration(seconds: value.toInt()));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    player.positionStream.listen((p) {
-      setState(() {
-        position = p;
-      });
-    });
-
-    player.durationStream.listen((d) {
-      setState(() {
-        duration = d!;
-      });
-    });
-
-    player.playerStateStream.listen((state) {
-      if (state.processingState == ProcessingState.completed) {
-        setState(() {
-          position = Duration.zero;
-        });
-        player.pause();
-        player.seek(position);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('List of all music')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -214,11 +177,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(height: 100),
-                Text('List of all music'),
-                SizedBox(height: 50),
+                SizedBox(height: 10),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.7,
+                  height: MediaQuery.of(context).size.height * 0.75,
                   width: MediaQuery.of(context).size.width * 1,
                   child: ListView.builder(
                     itemCount: testmap.length,
@@ -231,33 +192,22 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 children: [
                                   Center(child: Text(titlekey[index])),
                                   indexid == index
-                                      ? Column(
+                                      ? Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Slider(
-                                            min: 0.0,
-                                            max: duration.inSeconds.toDouble(),
-                                            value:
-                                                position.inSeconds.toDouble(),
-                                            onChanged: handleSeek,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(musicduration(position)),
-                                              Text(musicduration(duration)),
-                                            ],
-                                          ),
                                           IconButton(
                                             onPressed: () {
-                                              player.playing
-                                                  ? player.pause()
-                                                  : player.play();
+                                              setState(() {
+                                                player.playing
+                                                    ? player.stop()
+                                                    : player.play();
+                                              });
                                             },
                                             icon: Icon(
                                               player.playing
-                                                  ? Icons.play_arrow
-                                                  : Icons.stop,
+                                                  ? Icons.stop
+                                                  : Icons.play_arrow,
                                             ),
                                           ),
                                         ],
@@ -271,18 +221,18 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                         onTap: () {
                           setState(() {
                             indexid = index;
+                            var listitem = testmap.values.toList();
+                            player.setAudioSources(
+                              listitem,
+                              initialIndex: index,
+                              initialPosition: Duration.zero,
+                              shuffleOrder: DefaultShuffleOrder(),
+                            );
                           });
 
-                          var listitem = testmap.values.toList();
-                          player.setAudioSources(
-                            listitem,
-                            initialIndex: index,
-                            initialPosition: Duration.zero,
-                            shuffleOrder: DefaultShuffleOrder(),
-                          );
                           player.setLoopMode(LoopMode.all);
                           player.setVolume(0.3);
-                          player.play();
+                          player.playing ? player.stop() : player.play();
                         },
                       );
                     },
@@ -296,36 +246,3 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     );
   }
 }
-
-
-
-// player.playing
-//                                       ? Row(
-//                                         mainAxisAlignment:
-//                                             MainAxisAlignment.center,
-//                                         children: [
-//                                           IconButton(
-//                                             onPressed: () {
-//                                               player.seekToPrevious();
-//                                             },
-//                                             icon: Icon(Icons.skip_previous),
-//                                           ),
-
-//                                           IconButton(
-//                                             onPressed: () {
-//                                               player.playing
-//                                                   ? player.pause()
-//                                                   : player.play();
-//                                             },
-//                                             icon: Icon(Icons.play_arrow),
-//                                           ),
-
-//                                           IconButton(
-//                                             onPressed: () {
-//                                               player.seekToNext();
-//                                             },
-//                                             icon: Icon(Icons.skip_next),
-//                                           ),
-//                                         ],
-//                                       )
-//                                       : Text(''),

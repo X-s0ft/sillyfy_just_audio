@@ -10,7 +10,7 @@ class NavigationFolder extends StatefulWidget {
 
 class _NavigationFolderState extends State<NavigationFolder> {
   int index = 0;
-  List listScreens = [AboutScreen(), PlaylistScreen(), OptionScreen()];
+  List listScreens = [PlaylistScreen(), AboutScreen()];
 
   void _onTapitem(int indexscreen) {
     setState(() {
@@ -28,17 +28,10 @@ class _NavigationFolderState extends State<NavigationFolder> {
         selectedIndex: index,
         destinations: const <Widget>[
           NavigationDestination(
-            icon: Icon(Icons.access_time_filled),
-            label: 'About',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.access_time_filled),
+            icon: Icon(Icons.music_note),
             label: 'Playlist',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.access_time_filled),
-            label: 'Options',
-          ),
+          NavigationDestination(icon: Icon(Icons.info), label: 'About'),
         ],
       ),
     );

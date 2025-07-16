@@ -14,7 +14,7 @@ class AboutScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(20),
               child: Text(
-                'Sillyfy is a simple app for listening to music. The project will have playlists, as well as a playlist randomizer and the entire list of music.',
+                'Sillyfy is a simple app for listening to music.',
                 textAlign: TextAlign.center,
               ),
             ),
