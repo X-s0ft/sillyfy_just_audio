@@ -20,9 +20,7 @@
     - just_audio (https://pub.dev/packages/just_audio)
 
 
-## Relise
+## Bug report
 
-
-
-## Music  (30 tracks)
+- При переходе на новую страницу и возврате на старую страница не сохраняет состояние 
 

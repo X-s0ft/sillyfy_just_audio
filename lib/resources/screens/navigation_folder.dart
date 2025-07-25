@@ -8,9 +8,10 @@ class NavigationFolder extends StatefulWidget {
   State<NavigationFolder> createState() => _NavigationFolderState();
 }
 
+
 class _NavigationFolderState extends State<NavigationFolder> {
   int index = 0;
-  List listScreens = [PlaylistScreen(), AboutScreen()];
+  List listScreens = [const PlaylistScreen(), const AboutScreen()];
 
   void _onTapitem(int indexscreen) {
     setState(() {
@@ -21,17 +22,19 @@ class _NavigationFolderState extends State<NavigationFolder> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: listScreens.elementAt(index),
+      body: 
+      // IndexedStack(index: index, children: [listScreens.elementAt(index)],) ,
+      listScreens.elementAt(index),
       bottomNavigationBar: NavigationBar(
-        height: 70,
+        height: 60,
         onDestinationSelected: _onTapitem,
         selectedIndex: index,
         destinations: const <Widget>[
           NavigationDestination(
-            icon: Icon(Icons.music_note),
+            icon: Icon(Icons.music_note, color: Colors.white,),
             label: 'Playlist',
           ),
-          NavigationDestination(icon: Icon(Icons.info), label: 'About'),
+          NavigationDestination(icon: Icon(Icons.info,  color: Colors.white,), label: 'About'),
         ],
       ),
     );

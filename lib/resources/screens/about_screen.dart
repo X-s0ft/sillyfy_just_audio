@@ -19,7 +19,7 @@ class AboutScreen extends StatelessWidget {
               ),
             ),
 
-            Text('Just relax and enjoy musics :)'),
+            Text('Just relax and enjoy musics :)',textAlign: TextAlign.center,),
           ],
         ),
       ),

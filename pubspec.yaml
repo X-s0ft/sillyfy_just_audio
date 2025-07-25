@@ -25,3 +25,7 @@ flutter:
     - lib/resources/style/fonts/Simply Charming.ttf
     - lib/resources/music/
 
+fonts: 
+  - family: Simply Charming
+    fonts:
+      - assets: lib/resources/style/fonts/Simply Charming.ttf 

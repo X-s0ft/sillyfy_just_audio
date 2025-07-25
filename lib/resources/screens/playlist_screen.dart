@@ -9,7 +9,7 @@ class PlaylistScreen extends StatefulWidget {
   State<PlaylistScreen> createState() => _PlaylistScreenState();
 }
 
-final testmap = <String, AudioSource>{
+final mainmap = <String, AudioSource>{
   '2003 Toyota Corolla - 2010 Toyota Corolla': AudioSource.asset(
     'lib/resources/music/2003 Toyota Corolla - 2010 Toyota Corolla.mp3',
     tag: MediaItem(id: '1', title: '2003 Toyota Corolla - 2010 Toyota Corolla'),
@@ -163,82 +163,114 @@ final testmap = <String, AudioSource>{
 
 class _PlaylistScreenState extends State<PlaylistScreen> {
   final player = AudioPlayer();
-  var titlekey = testmap.keys.toList();
+  final titlekey = mainmap.keys.toList();
   var indexid = -1;
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('List of all music')),
+      appBar: AppBar(title: Center(child: Text('List of all music'))),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(height: 10),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.75,
-                  width: MediaQuery.of(context).size.width * 1,
-                  child: ListView.builder(
-                    itemCount: testmap.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Row(
-                          children: [
-                            Flexible(
-                              child: Column(
-                                children: [
-                                  Center(child: Text(titlekey[index])),
-                                  indexid == index
-                                      ? Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                player.playing
-                                                    ? player.stop()
-                                                    : player.play();
-                                              });
-                                            },
-                                            icon: Icon(
-                                              player.playing
-                                                  ? Icons.stop
-                                                  : Icons.play_arrow,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                      : Text(''),
-                                ],
+            SizedBox(
+              height:
+                  MediaQuery.of(context).size.height < 500
+                      ? MediaQuery.of(context).size.height * 0.60
+                      : MediaQuery.of(context).size.height * 0.80,
+              width: MediaQuery.of(context).size.width * 1,
+              child: ListView.builder(
+                itemCount:  mainmap.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Row(
+                      children: [
+                        Flexible(
+                          child: Column(
+                            children: [
+                              Center(
+                                child: Text(
+                                  titlekey[index],
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                               ),
-                            ),
-                          ],
+                              indexid == index
+                                  ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      indexid > 0 ?
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() { 
+                                            indexid--;
+                                          });
+                                          player.seekToPrevious();
+                                        },
+                                        icon: Icon(
+                                          Icons.fast_rewind,
+                                          color: Colors.white,
+                                        ),
+                                      ) : SizedBox(),
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            player.playing
+                                                ? player.stop()
+                                                : player.play();
+                                          });
+                                        },
+                                        icon: Icon(
+                                          player.playing
+                                              ? Icons.stop
+                                              : Icons.play_arrow,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      index == mainmap.length - 1 ? 
+                                      SizedBox() : 
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            indexid++;
+                                          });
+                                          player.seekToNext();
+                                        },
+                                        icon: Icon(
+                                          Icons.fast_forward,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                  : SizedBox(),
+                            ],
+                          ),
                         ),
-                        onTap: () {
-                          setState(() {
-                            indexid = index;
-                            var listitem = testmap.values.toList();
-                            player.setAudioSources(
-                              listitem,
-                              initialIndex: index,
-                              initialPosition: Duration.zero,
-                              shuffleOrder: DefaultShuffleOrder(),
-                            );
-                          });
+                      ],
+                    ),
+                    onTap: () {
+                      setState(() {
+                        indexid = index;
+                        var listitem = mainmap.values.toList();
+                        player.setAudioSources(
+                          listitem,
+                          initialIndex: index,
+                          initialPosition: Duration.zero,
+                          shuffleOrder: DefaultShuffleOrder(),
+                        );
+                      });
 
-                          player.setLoopMode(LoopMode.all);
-                          player.setVolume(0.3);
-                          player.playing ? player.stop() : player.play();
-                        },
-                      );
+                      player.setLoopMode(LoopMode.all);
+                      player.setVolume(0.4);
+                      player.play();
                     },
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
           ],
         ),
